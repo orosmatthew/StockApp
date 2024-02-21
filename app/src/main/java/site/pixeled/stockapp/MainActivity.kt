@@ -30,7 +30,9 @@ class MainActivity : AppCompatActivity() {
         if (!mIsMonitoring) {
             mIsMonitoring = true
             findViewById<Button>(R.id.monitorButton).text = "Cancel"
-            val symbolText = findViewById<EditText>(R.id.stockSymbolField).text.toString()
+            val stockSymbolField = findViewById<TextView>(R.id.stockSymbolField)
+            val symbolText = stockSymbolField.text.toString()
+            stockSymbolField.isEnabled = false
             mCurrentSymbol = symbolText
             mTimer = Timer()
             mTimer.scheduleAtFixedRate(0, 1000) {
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             findViewById<Button>(R.id.monitorButton).text = "Monitor"
+            findViewById<TextView>(R.id.stockSymbolField).isEnabled = true
             mTimer.cancel()
             mIsMonitoring = false
         }
