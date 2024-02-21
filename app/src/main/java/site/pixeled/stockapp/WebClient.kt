@@ -6,7 +6,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
-import org.json.JSONObject
 import site.pixeled.stockapp.models.StockStatus
 import java.util.concurrent.CompletableFuture
 
@@ -14,7 +13,7 @@ object WebClient {
     private var mQueue: RequestQueue? = null
 
     private fun init(context: Context) {
-        mQueue = Volley.newRequestQueue(context);
+        mQueue = Volley.newRequestQueue(context)
     }
 
     fun fetchStockPrice(context: Context, symbol: String): CompletableFuture<StockStatus> {
