@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         stockSymbolField.isEnabled = false
         mCurrentSymbol = symbolText
         mTimer = Timer()
-        mTimer.scheduleAtFixedRate(0, 1000) {
+        mTimer.scheduleAtFixedRate(0, 5000) {
             WebClient.fetchStockPrice(this@MainActivity, symbolText).thenAccept { res ->
                 Log.i("StockStatus", res.stockPrice.toString())
                 val df = DecimalFormat("##.##")
