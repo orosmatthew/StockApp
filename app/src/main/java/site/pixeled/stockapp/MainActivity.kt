@@ -24,42 +24,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
+    private fun startMonitoring() {
+        mIsMonitoring = true
+        findViewById<Button>(R.id.monitorButton).text = "Cancel"
+        val stockSymbolField = findViewById<TextView>(R.id.stockSymbolField)
+        val symbolText = stockSymbolField.text.toString()
+        stockSymbolField.isEnabled = false
+        mCurrentSymbol = symbolText
+        mTimer = Timer()
+        mTimer.scheduleAtFixedRate(0, 1000) {
+            WebClient.fetchStockPrice(this@MainActivity, symbolText).thenAccept { res ->
+                Log.i("StockStatus", res.stockPrice.toString())
+                val df = DecimalFormat("##.##")
+                findViewById<TextView>(R.id.stockPriceTextView).text =
+                    "$mCurrentSymbol: ${df.format(res.stockPrice)}"
+                mCurrentStockPrice?.let {
+                    if (res.stockPrice > it) {
+                        findViewById<TextView>(R.id.stockPriceTextView).setTextColor(Color.GREEN)
+                    } else {
+                        findViewById<TextView>(R.id.stockPriceTextView).setTextColor(Color.RED)
+                    }
+                }
+                mCurrentStockPrice = res.stockPrice
+            }.exceptionally { err ->
+                Log.e("StockStatus", err.message.toString())
+                null
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun stopMonitoring() {
+        findViewById<Button>(R.id.monitorButton).text = "Monitor"
+        findViewById<TextView>(R.id.stockSymbolField).isEnabled = true
+        mTimer.cancel()
+        mIsMonitoring = false
+    }
+
     @Suppress("UNUSED_PARAMETER")
     fun onMonitorClick(view: View) {
         if (!mIsMonitoring) {
-            mIsMonitoring = true
-            findViewById<Button>(R.id.monitorButton).text = "Cancel"
-            val stockSymbolField = findViewById<TextView>(R.id.stockSymbolField)
-            val symbolText = stockSymbolField.text.toString()
-            stockSymbolField.isEnabled = false
-            mCurrentSymbol = symbolText
-            mTimer = Timer()
-            mTimer.scheduleAtFixedRate(0, 1000) {
-                WebClient.fetchStockPrice(this@MainActivity, symbolText).thenAccept { res ->
-                    Log.i("StockStatus", res.stockPrice.toString())
-                    val df = DecimalFormat("##.##")
-                    findViewById<TextView>(R.id.stockPriceTextView).text =
-                        "$mCurrentSymbol: ${df.format(res.stockPrice)}"
-                    mCurrentStockPrice?.let {
-                        if (res.stockPrice > it) {
-                            findViewById<TextView>(R.id.stockPriceTextView).setTextColor(Color.GREEN)
-                        } else {
-                            findViewById<TextView>(R.id.stockPriceTextView).setTextColor(Color.RED)
-                        }
-                    }
-                    mCurrentStockPrice = res.stockPrice
-                }.exceptionally { err ->
-                    Log.e("StockStatus", err.message.toString())
-                    null
-                }
-            }
+            startMonitoring()
         } else {
-            findViewById<Button>(R.id.monitorButton).text = "Monitor"
-            findViewById<TextView>(R.id.stockSymbolField).isEnabled = true
-            mTimer.cancel()
-            mIsMonitoring = false
+            stopMonitoring()
         }
-
-
     }
 }
